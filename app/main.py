@@ -1,14 +1,16 @@
-from fastapi import FastAPI
-from mangum import Mangum
+# from fastapi import FastAPI
+# from mangum import Mangum
 
-app = FastAPI()
+# app = FastAPI()
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+# @app.get("/")
+# def read_root():
+#     return {"Hello": "World"}
 
-#   # Mangum is used to adapt FastAPI for Lambda
-handler = Mangum(app)
+# #   # Mangum is used to adapt FastAPI for Lambda
+# # handler = Mangum(app)
+# from mangum import Mangum
+
 # from fastapi import FastAPI, Depends, HTTPException
 # from sqlalchemy.orm import Session
 # from app import crud, models, schemas
@@ -45,3 +47,14 @@ handler = Mangum(app)
 # def get_member_profile(member_id: int, db: Session = Depends(get_db)):
 #     return crud.get_profile(db=db, member_id=member_id)
 # handler = Mangum(app)
+from fastapi import FastAPI
+from mangum import Mangum
+
+app = FastAPI()
+
+@app.get("/")
+def read_root():
+    return {"success": "The API is running!"}
+
+# Create the handler that AWS Lambda will use
+handler = Mangum(app)  # Mangum is used to adapt FastAPI for Lambda
