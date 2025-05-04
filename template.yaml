@@ -26,6 +26,33 @@
 #     Properties:
 #       Name: fastapi-api
 #       StageName: prod
+# AWSTemplateFormatVersion: '2010-09-09'
+# Transform: 'AWS::Serverless-2016-10-31'
+
+# Resources:
+#   FastAPIApp:
+#     Type: 'AWS::Serverless::Function'
+#     Properties:
+#       Handler: app.main.handler  
+#       Runtime: python3.8
+#       CodeUri: app/
+#       MemorySize: 512
+#       Timeout: 10
+#       Environment:
+#         Variables:
+#           SOME_ENV_VAR: "value"
+#       Events:
+#         ApiGateway:
+#           Type: Api
+#           Properties:
+#             RestApiId: !Ref FastAPIRestApi
+#             Path: /  # The path for the Lambda function trigger
+#             Method: GET  # HTTP Method
+          
+#   FastAPIRestApi:
+#     Type: 'AWS::Serverless::Api'
+#     Properties:
+#       Name: fastapi-api
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 
@@ -33,24 +60,23 @@ Resources:
   FastAPIApp:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: app.main.handler  
+      Handler: app.main.handler  # The path to your handler function
       Runtime: python3.8
-      CodeUri: app/
+      CodeUri: app/  # The directory containing your FastAPI app code
       MemorySize: 512
       Timeout: 10
       Environment:
         Variables:
-          SOME_ENV_VAR: "value"
+          SOME_ENV_VAR: "value"  # You can set environment variables here
       Events:
         ApiGateway:
           Type: Api
           Properties:
-            RestApiId: !Ref FastAPIRestApi
+            RestApiId: !Ref FastAPIRestApi  # Reference to the API Gateway below
             Path: /  # The path for the Lambda function trigger
-            Method: GET  # HTTP Method
-          
+            Method: GET  # HTTP method
+
   FastAPIRestApi:
     Type: 'AWS::Serverless::Api'
     Properties:
-      Name: fastapi-api
-      StageName: prod
+      Name: fastapi-api  # API Gateway name
