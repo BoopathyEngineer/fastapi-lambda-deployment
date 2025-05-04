@@ -1,3 +1,6 @@
 fastapi
-mangum
 uvicorn
+sqlalchemy
+psycopg2
+python-dotenv
+mangum

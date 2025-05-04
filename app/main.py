@@ -1,5 +1,5 @@
 # from fastapi import FastAPI
-# from mangum import Mangum
+from mangum import Mangum
 
 # app = FastAPI()
 
@@ -7,7 +7,7 @@
 # def read_root():
 #     return {"Hello": "World"}
 
-# handler = Mangum(app)  # Mangum is used to adapt FastAPI for Lambda
+  # Mangum is used to adapt FastAPI for Lambda
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import crud, models, schemas
@@ -43,3 +43,4 @@ def attempt_challenge(challenge_id: int, member_id: int, db: Session = Depends(g
 @app.get("/profile", response_model=schemas.Member)
 def get_member_profile(member_id: int, db: Session = Depends(get_db)):
     return crud.get_profile(db=db, member_id=member_id)
+handler = Mangum(app)
