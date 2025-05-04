@@ -14,7 +14,7 @@ from mangum import Mangum
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 import crud, models, schemas
-from app.database import SessionLocal, engine
+from database import SessionLocal, engine
 from typing import List, Optional
 
 # Initialize the database

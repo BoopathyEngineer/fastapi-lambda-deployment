@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app import models, schemas
+import models, schemas
 
 def create_member(db: Session, member: schemas.MemberBase):
     db_member = models.Member(name=member.name, email=member.email, phone=member.phone)
