@@ -1,3 +1,31 @@
+# AWSTemplateFormatVersion: '2010-09-09'
+# Transform: 'AWS::Serverless-2016-10-31'
+
+# Resources:
+#   FastAPIApp:
+#     Type: 'AWS::Serverless::Function'
+#     Properties:
+#       Handler: app.handler
+#       Runtime: python3.8
+#       CodeUri: app/
+#       MemorySize: 512
+#       Timeout: 10
+#       Environment:
+#         Variables:
+#           SOME_ENV_VAR: "value"
+#       Events:
+#         ApiGateway:
+#           Type: Api
+#           Properties:
+#             RestApiId: !Ref FastAPIRestApi
+#             Path: /  # The path for the Lambda function trigger
+#             Method: GET  # HTTP Method
+          
+#   FastAPIRestApi:
+#     Type: 'AWS::Serverless::Api'
+#     Properties:
+#       Name: fastapi-api
+#       StageName: prod
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 
@@ -5,7 +33,7 @@ Resources:
   FastAPIApp:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: app.handler
+      Handler: app.main.handler  
       Runtime: python3.8
       CodeUri: app/
       MemorySize: 512
