@@ -53,9 +53,27 @@
 #     Type: 'AWS::Serverless::Api'
 #     Properties:
 #       Name: fastapi-api
-#       StageName: prod
+# #       StageName: prod
+# AWSTemplateFormatVersion: '2010-09-09'
+# Transform: 'AWS::Serverless-2016-10-31'
+# Resources:
+#   FastApiLambdaFunction:
+#     Type: 'AWS::Serverless::Function'
+#     Properties:
+#       Handler: app.handler.handler
+#       Runtime: python3.8
+#       CodeUri: .
+#       MemorySize: 128
+#       Timeout: 100
+#       Events:
+#         Api:
+#           Type: Api
+#           Properties:
+#             Path: /{proxy+}
+#             Method: any
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
+
 Resources:
   FastApiLambdaFunction:
     Type: 'AWS::Serverless::Function'
@@ -66,8 +84,13 @@ Resources:
       MemorySize: 128
       Timeout: 100
       Events:
-        Api:
+        Endpoint1:
           Type: Api
           Properties:
-            Path: /{proxy+}
-            Method: any
+            Path: /v1/endpoint1
+            Method: get
+        Endpoint2:
+          Type: Api
+          Properties:
+            Path: /v1/endpoint2
+            Method: post
