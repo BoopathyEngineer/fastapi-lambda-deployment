@@ -71,26 +71,144 @@
 #           Properties:
 #             Path: /{proxy+}
 #             Method: any
+# AWSTemplateFormatVersion: '2010-09-09'
+# Transform: 'AWS::Serverless-2016-10-31'
+
+# Resources:
+#   FastApiLambdaFunction:
+#     Type: 'AWS::Serverless::Function'
+#     Properties:
+#       Handler: app.handler.handler
+#       Runtime: python3.8
+#       CodeUri: .
+#       MemorySize: 128
+#       Timeout: 100
+#       Events:
+#         Endpoint1:
+#           Type: Api
+#           Properties:
+#             Path: /v1/endpoint1
+#             Method: get
+#         Endpoint2:
+#           Type: Api
+#           Properties:
+#             Path: /v1/endpoint2
+#             Method: post
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 
 Resources:
-  FastApiLambdaFunction:
+  # Cognito User Pool
+  UserPool:
+    Type: 'AWS::Cognito::UserPool'
+    Properties:
+      UserPoolName: 'FastAPIUserPool'
+      AutoVerifiedAttributes:
+        - email  # Automatically verifies users' emails
+      MfaConfiguration: OFF  # Turn off MFA (Modify based on your security needs)
+      
+  # Cognito User Pool Client
+  UserPoolClient:
+    Type: 'AWS::Cognito::UserPoolClient'
+    Properties:
+      ClientName: 'FastAPIClient'
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false  # Do not generate client secret for direct authentication
+      ExplicitAuthFlows:
+        - 'USER_PASSWORD_AUTH'  # Enable password-based authentication
+
+  # API Gateway with Cognito authentication for /v1/signup and /v1/login
+  FastApiApi:
+    Type: 'AWS::Serverless::Api'
+    Properties:
+      Name: 'FastAPI-Cognito-API'
+      StageName: 'Prod'
+      DefinitionBody:
+        swagger: '2.0'
+        info:
+          title: 'FastAPI API'
+          version: '1.0'
+        paths:
+          /v1/signup:
+            post:
+              operationId: 'signup'
+              x-amazon-apigateway-integration:
+                uri: arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/${FastApiLambda.Arn}/invocations
+                httpMethod: POST
+                type: aws_proxy
+          /v1/login:
+            post:
+              operationId: 'login'
+              x-amazon-apigateway-integration:
+                uri: arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/${FastApiLambda.Arn}/invocations
+                httpMethod: POST
+                type: aws_proxy
+          /v1/endpoint1:
+            get:
+              operationId: 'endpoint1'
+              security:
+                - ApiKey: []  # Requires API Key for access
+              x-amazon-apigateway-integration:
+                uri: arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/${FastApiLambda.Arn}/invocations
+                httpMethod: GET
+                type: aws_proxy
+          /v1/endpoint2:
+            post:
+              operationId: 'endpoint2'
+              security:
+                - ApiKey: []  # Requires API Key for access
+              x-amazon-apigateway-integration:
+                uri: arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/${FastApiLambda.Arn}/invocations
+                httpMethod: POST
+                type: aws_proxy
+      ApiKeySourceType: HEADER
+
+  # API Gateway API Key for Authentication
+  ApiGatewayApiKey:
+    Type: 'AWS::ApiGateway::ApiKey'
+    Properties:
+      Name: 'FastAPI-API-Key'
+      Enabled: true
+      StageKeys:
+        - RestApiId: !Ref FastApiApi
+          StageName: 'Prod'
+
+  # Lambda Function for FastAPI
+  FastApiLambda:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: app.handler.handler
       Runtime: python3.8
-      CodeUri: .
+      CodeUri: ./  # Directory where your FastAPI code is located
       MemorySize: 128
       Timeout: 100
       Events:
-        Endpoint1:
+        ApiEvent:
           Type: Api
           Properties:
+            RestApiId: !Ref FastApiApi
+            Path: /v1/signup
+            Method: post
+        LoginEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref FastApiApi
+            Path: /v1/login
+            Method: post
+        Endpoint1Event:
+          Type: Api
+          Properties:
+            RestApiId: !Ref FastApiApi
             Path: /v1/endpoint1
             Method: get
-        Endpoint2:
+        Endpoint2Event:
           Type: Api
           Properties:
+            RestApiId: !Ref FastApiApi
             Path: /v1/endpoint2
             Method: post
+
+Outputs:
+  ApiGatewayUrl:
+    Description: "API Gateway URL"
+    Value: !Sub "https://${FastApiApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
