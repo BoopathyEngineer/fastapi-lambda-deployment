@@ -80,7 +80,7 @@
 #       run: |
 #         sam deploy --no-confirm-changeset --stack-name fastapi-lambda-stack --capabilities CAPABILITY_IAM
 #       env:
-#         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         AWS_ACCESS_KEY_ID: '${{ secrets.AWS_ACCESS_KEY_ID }}
 #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 #         AWS_DEFAULT_REGION: us-east-1
 name: Deploy FastAPI to AWS Lambda
@@ -121,12 +121,10 @@ jobs:
         pip install --upgrade pip
         pip install -r app/requirements.txt
 
-    # Step 5: Install AWS SAM CLI
+    # Step 5: Install AWS SAM CLI using official repository (Ubuntu)
     - name: Install AWS SAM CLI
       run: |
-        curl -sL https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.tar.gz -o /tmp/aws-sam-cli-linux-x86_64.tar.gz
-        sudo tar -xvzf /tmp/aws-sam-cli-linux-x86_64.tar.gz -C /usr/local/
-        sudo /usr/local/aws-sam-cli/install
+        curl -fsSL https://s3.amazonaws.com/aws-sam-cli-releases/latest/install.sh | sudo bash
 
     # Step 6: Build and Deploy the SAM Application
     - name: Build and Deploy with SAM
@@ -135,7 +133,7 @@ jobs:
         sam deploy \
           --stack-name fastapi-stack \
           --capabilities CAPABILITY_IAM \
-          --region us-east-1 \
+          --region us-west-2 \
           --no-confirm-changeset \
           --resolve-s3
 
