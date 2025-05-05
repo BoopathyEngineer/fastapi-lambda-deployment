@@ -62,6 +62,11 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-@app.get("/")
-def read_root():
-    return {"message": "Hello, Lambda!"}
+@app.get("/v1/endpoint1")
+def endpoint1():
+    return {"message": "This is endpoint 1"}
+
+@app.post("/v1/endpoint2")
+def endpoint2(data: dict):
+    return {"received": data}
+
